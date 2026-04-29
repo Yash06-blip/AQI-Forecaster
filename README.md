@@ -198,7 +198,7 @@ the model to learn genuine temporal and meteorological patterns.
 
 ## Live API
 
-🔗 *Deployment in progress — link will be added after Render deployment*
+🔗 🔗 **Live API:** https://aqi-forecaster-q1vv.onrender.com/docs
 
 --- 
 
