@@ -64,8 +64,7 @@ class ForecastRequest(BaseModel):
         description="Datetime for which to generate forecast (YYYY-MM-DD HH:MM:SS)"
     )
 
-    class Config:
-        allow_population_by_field_name = True
+    model_config = {"populate_by_name": True}
 
 # ── RESPONSE SCHEMA ───────────────────────────────────────────────
 class ForecastResponse(BaseModel):
