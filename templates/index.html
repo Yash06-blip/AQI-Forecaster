@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Delhi Air Quality Forecast</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-dot"></div>
+    Delhi Air Quality Forecast
+  </div>
+  <div class="header-meta" id="liveClock">—</div>
+</header>
+
+<main>
+
+  <!-- HERO: GAUGE + FORECAST DETAILS -->
+  <div class="hero-grid">
+
+    <div class="card gauge-card">
+      <div class="card-label">Predicted AQI — Tomorrow</div>
+      <div class="gauge-wrap">
+        <canvas id="gaugeCanvas" width="280" height="160"></canvas>
+        <div class="gauge-center">
+          <div class="gauge-value" id="gaugeValue">—</div>
+          <div class="gauge-category" id="gaugeCategory" style="margin-top:6px">Loading…</div>
+        </div>
+      </div>
+      <p class="gauge-subtitle" id="gaugeSubtitle">
+        Fetching forecast from model…
+      </p>
+    </div>
+
+    <div class="card forecast-card">
+      <div>
+        <div class="card-label">What this means for you</div>
+        <div class="forecast-headline" id="forecastHeadline">Calculating Delhi's air for tomorrow…</div>
+        <div class="forecast-subline" id="forecastSubline">Based on today's pollution readings, weather data, and seasonal patterns.</div>
+      </div>
+
+      <div class="forecast-stats">
+        <div class="stat-box">
+          <div class="stat-value" id="statLower">—</div>
+          <div class="stat-label">Likely minimum</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="statUpper">—</div>
+          <div class="stat-label">Likely maximum</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">21%</div>
+          <div class="stat-label">Avg. error (MAPE)</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">42</div>
+          <div class="stat-label">Backtest windows</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="confidence-bar-wrap">
+          <div class="confidence-label-row">
+            <span>Confidence range</span>
+            <span id="confRange">—</span>
+          </div>
+          <div class="confidence-bar">
+            <div class="confidence-fill" id="confFill" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="health-advice" id="healthAdvice">
+        <span class="health-icon">💨</span>
+        <span id="healthText">Loading health guidance…</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- HISTORICAL CHART -->
+  <div class="card chart-card">
+    <div class="chart-header">
+      <div class="chart-title">Delhi AQI — Recent Trend</div>
+      <div class="chart-legend">
+        <span><span class="legend-dot" style="background:#4F7BE8"></span>Historical AQI</span>
+        <span><span class="legend-dot" style="background:#E84F4F; border: 2px dashed #E84F4F; background:transparent; width:12px; height:0; border-radius:0; display:inline-block; border-left:none; border-right:none; vertical-align:middle; margin-bottom:2px;"></span>Forecast</span>
+      </div>
+    </div>
+    <div class="chart-wrap">
+      <canvas id="aqiChart"></canvas>
+    </div>
+  </div>
+
+  <!-- CUSTOM FORECAST FORM -->
+  <div class="card">
+    <div class="card-label">Try Your Own Forecast</div>
+    <p style="font-size:14px; color:var(--muted); margin-bottom:24px; line-height:1.6;">
+      Enter today's air quality readings to get a custom 24-hour prediction. 
+      You can find current readings on the 
+      <a href="https://app.cpcbccr.com/AQI_India/" target="_blank" style="color:var(--text); font-weight:500;">CPCB portal</a>.
+    </p>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Today's AQI</label>
+        <input type="number" id="inp_aqi24" placeholder="e.g. 187" min="0" max="500"/>
+        <span class="form-hint">Current AQI reading</span>
+      </div>
+      <div class="form-group">
+        <label>AQI Yesterday</label>
+        <input type="number" id="inp_aqi48" placeholder="e.g. 210" min="0" max="500"/>
+        <span class="form-hint">Yesterday's AQI</span>
+      </div>
+      <div class="form-group">
+        <label>AQI 2 Days Ago</label>
+        <input type="number" id="inp_aqi72" placeholder="e.g. 198" min="0" max="500"/>
+        <span class="form-hint">Day before yesterday</span>
+      </div>
+      <div class="form-group">
+        <label>AQI Last Week</label>
+        <input type="number" id="inp_aqi168" placeholder="e.g. 175" min="0" max="500"/>
+        <span class="form-hint">Same day last week</span>
+      </div>
+      <div class="form-group">
+        <label>Temperature (°C)</label>
+        <input type="number" id="inp_temp" placeholder="e.g. 32" min="-5" max="50"/>
+        <span class="form-hint">Today's temperature</span>
+      </div>
+      <div class="form-group">
+        <label>Humidity (%)</label>
+        <input type="number" id="inp_humid" placeholder="e.g. 65" min="0" max="100"/>
+        <span class="form-hint">Relative humidity</span>
+      </div>
+      <div class="form-group">
+        <label>Wind Speed (km/h)</label>
+        <input type="number" id="inp_wind" placeholder="e.g. 12" min="0" max="100"/>
+        <span class="form-hint">Current wind speed</span>
+      </div>
+      <div class="form-group">
+        <label>PM2.5</label>
+        <input type="number" id="inp_pm25" placeholder="e.g. 98" min="0"/>
+        <span class="form-hint">Fine particle reading</span>
+      </div>
+      <div class="form-group">
+        <label>PM10</label>
+        <input type="number" id="inp_pm10" placeholder="e.g. 145" min="0"/>
+        <span class="form-hint">Coarse particle reading</span>
+      </div>
+    </div>
+
+    <button class="btn-forecast" onclick="runCustomForecast()">
+      <span id="btnText">Get Tomorrow's Forecast</span>
+      <div class="spinner" id="btnSpinner"></div>
+    </button>
+
+    <div class="result-banner" id="resultBanner">
+      <div class="card-label" style="margin-bottom:12px">Your forecast result</div>
+      <div class="result-row">
+        <div class="result-aqi" id="resultAQI">—</div>
+        <div class="result-category" id="resultCategory">—</div>
+      </div>
+      <div class="result-range" id="resultRange">—</div>
+      <div class="result-advice" id="resultAdvice" style="margin-top:12px">—</div>
+    </div>
+  </div>
+
+  <!-- AQI SCALE -->
+  <div class="card">
+    <div class="card-label">How to read AQI</div>
+    <div class="aqi-scale">
+      <div class="scale-item" style="background:#E8F5E9; color:#2E7D32;">
+        <div class="scale-range">0–50</div>
+        <div class="scale-name">Good</div>
+        <div class="scale-tip">Air quality is satisfactory. Go outside freely.</div>
+      </div>
+      <div class="scale-item" style="background:#F9FBE7; color:#558B2F;">
+        <div class="scale-range">51–100</div>
+        <div class="scale-name">Satisfactory</div>
+        <div class="scale-tip">Acceptable. Sensitive people should be cautious.</div>
+      </div>
+      <div class="scale-item" style="background:#FFF8E1; color:#F57F17;">
+        <div class="scale-range">101–200</div>
+        <div class="scale-name">Moderate</div>
+        <div class="scale-tip">May cause breathing discomfort with prolonged exposure.</div>
+      </div>
+      <div class="scale-item" style="background:#FBE9E7; color:#BF360C;">
+        <div class="scale-range">201–300</div>
+        <div class="scale-name">Poor</div>
+        <div class="scale-tip">Breathing discomfort for most. Avoid outdoor activity.</div>
+      </div>
+      <div class="scale-item" style="background:#FCE4EC; color:#880E4F;">
+        <div class="scale-range">301–400</div>
+        <div class="scale-name">Very Poor</div>
+        <div class="scale-tip">Respiratory illness on prolonged exposure. Stay indoors.</div>
+      </div>
+      <div class="scale-item" style="background:#EDE7F6; color:#4A148C;">
+        <div class="scale-range">401–500</div>
+        <div class="scale-name">Severe</div>
+        <div class="scale-tip">Health alert. Everyone should avoid all outdoor activity.</div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<div class="page-footer" style="padding-bottom:40px">
+  Powered by a machine learning model trained on 5.5 years of Delhi pollution data.<br/>
+  Model accuracy: MAE 39.3 · MAPE 21% · 42-window rolling backtest<br/>
+  <a href="https://aqi-forecaster-q1vv.onrender.com/docs" target="_blank">View API documentation</a>
+  &nbsp;·&nbsp;
+  <a href="https://github.com/Yash06-blip/AQI-Forecaster" target="_blank">GitHub</a>
+</div>
+
+<script src="/static/js/app.js"></script>
+</body>
+</html> 
+</body>
+</html>

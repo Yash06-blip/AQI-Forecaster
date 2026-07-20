@@ -1,68 +1,331 @@
-# AQI Forecaster
+# 🌫️ AQI Forecaster
 
-A production-grade machine learning API that forecasts Delhi's Air Quality Index (AQI) **24 hours ahead** using historical pollution data and weather signals.
+> **A production-ready machine learning web application that predicts Delhi's Air Quality Index (AQI) 24 hours in advance using historical pollution trends and weather conditions.**
 
-Built with Python, scikit-learn, and FastAPI. Deployed publicly on Render.
-
----
-
-## Problem
-
-Delhi's AQI swings dramatically — from 50 to 450 within days during winter. 
-Government portals show current readings but offer no forecast. This API closes 
-that gap by predicting what the AQI will be 24 hours from now, giving residents 
-and applications actionable advance warning.
+[![Python](https://img.shields.io/badge/Python-3.13-blue.svg)]()
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688.svg)]()
+[![Scikit-Learn](https://img.shields.io/badge/scikit--learn-1.8-F7931E.svg)]()
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg)]()
+[![Render](https://img.shields.io/badge/Deployment-Render-46E3B7.svg)]()
 
 ---
 
-## Results
+## 🚀 Live Demo
 
-| Model | MAE | MAPE | RMSE |
-|---|---|---|---|
-| Linear Regression ✅ | 39.3 | 21.0% | 57.1 |
+🌐 **Dashboard:** *(Render link here)*
+
+📚 **API Documentation:** *(Render link)/docs*
+
+---
+
+## 📸 Preview
+
+### Dashboard
+
+![Dashboard](assets/Dashboard.png)
+
+### Prediction
+![Predicted Output](assets/Predicted_output.png)
+![Prediction Form](assets/Prediction_form.png)
+
+### Historical Chart
+![Historical Chart](assets/Historical_chart.png)
+
+### Swagger UI
+![Swagger UI](assets/Swagger_UI.png)
+
+### Live Demo
+
+<p align="center">
+  <img src="assets/Demo.gif" width="900" alt="AQI Forecaster Demo">
+</p>
+
+---
+
+## 📖 Project Overview
+
+Delhi frequently experiences hazardous air pollution levels, especially during the winter months. While public platforms provide **real-time AQI readings**, they rarely answer an equally important question:
+
+> **"What will the air quality be tomorrow?"**
+
+AQI Forecaster addresses this by predicting **Delhi's Air Quality Index (AQI) 24 hours in advance** using a machine learning model trained on historical air quality and weather data.
+
+The application combines engineered temporal, pollution, and meteorological features with a **Linear Regression** model that was evaluated using a rolling time-series backtesting strategy to avoid data leakage. Predictions are served through a FastAPI backend and presented via an interactive web dashboard with confidence intervals, historical AQI visualization, and REST API endpoints.
+
+This project demonstrates the complete machine learning lifecycle—from data preprocessing and feature engineering to model evaluation, API development, Docker containerization, and cloud deployment.
+
+---
+
+## ✨ Features
+
+- 🔮 **24-Hour AQI Forecasting** – Predict Delhi's Air Quality Index one day in advance using a machine learning model.
+
+- 📊 **Interactive Dashboard** – Clean web interface for entering pollution and weather data and viewing predictions.
+
+- 📈 **Historical AQI Visualization** – Explore recent AQI trends through an interactive chart powered by historical data.
+
+- 🎯 **Confidence Interval Estimation** – Every prediction includes an estimated uncertainty range based on the model's backtesting performance.
+
+- 🚦 **AQI Category Classification** – Automatically classifies predictions into categories such as *Good*, *Moderate*, *Poor*, and *Severe*.
+
+- ⚡ **REST API** – FastAPI-powered endpoints for seamless integration with external applications.
+
+- 📚 **Interactive API Documentation** – Automatically generated Swagger UI for testing API endpoints.
+
+- 📝 **Structured Logging** – Centralized logging for prediction requests, model loading, and API operations.
+
+- ⚙️ **Configuration Management** – Centralized project configuration for paths, application metadata, and deployment settings.
+
+- 🐳 **Docker Support** – Fully containerized application for consistent local development and cloud deployment.
+
+---
+
+## 📊 Model Performance
+
+Three machine learning models were evaluated using a **rolling time-series backtesting strategy** across **42 evaluation windows (2018–2020)**. This approach ensures that the model is always tested on unseen future data, closely simulating real-world forecasting and preventing data leakage.
+
+| Model | MAE ↓ | MAPE ↓ | RMSE ↓ |
+|:------|------:|--------:|--------:|
+| **Linear Regression** ✅ | **39.3** | **21.0%** | **57.1** |
 | LightGBM | 41.6 | 22.4% | 61.4 |
 | Random Forest | 42.7 | 23.4% | 64.6 |
 
-Evaluated via **rolling backtest across 42 windows (2018–2020)** — never trained on future data.
+### 🏆 Best Performing Model
 
-Linear Regression outperformed tree-based models, indicating the engineered features 
-have a predominantly linear relationship with 24-hour AQI — complexity added noise, not signal.
+Despite evaluating more complex ensemble models, **Linear Regression** consistently achieved the lowest prediction error.
 
----
+This suggests that the engineered temporal, pollution, and weather features capture a largely linear relationship with AQI 24 hours ahead. More complex models such as LightGBM and Random Forest tended to overfit noise rather than improve generalization.
 
-## Architecture
-Raw Data (Kaggle CPCB + Open-Meteo Weather)
-↓
-Data Cleaning (forward-fill, hourly median imputation)
-↓
-Feature Engineering (29 features: lag, rolling stats, temporal, weather)
-↓
-Model Training + Rolling Backtest Evaluation
-↓
-Serialized Model (joblib)
-↓
-FastAPI Service → POST /forecast → JSON prediction + confidence range
+This result reinforces an important machine learning principle:
+
+> **A simpler model with strong feature engineering often outperforms a more complex model.**
 
 ---
 
-## Features Used (29 total)
+## 🏗️ System Architecture
 
-**Temporal:** hour, day_of_week, month, is_weekend, season
+```mermaid
+flowchart TD
 
-**AQI Lags:** 24h, 48h, 72h, 168h (1 week), 8760h (1 year)
+    A[Kaggle AQI Dataset] --> C[Data Cleaning & Preprocessing]
+    B[Open-Meteo Weather Data] --> C
 
-**Rolling Statistics:** 24h mean, 48h mean, 24h std, 24h max, 24h min
+    C --> D[Feature Engineering]
 
-**Pollutants:** PM2.5, PM10, NO2, CO, SO2, O3
+    D --> E[Linear Regression Model]
 
-**Weather (lagged 24h):** temperature, humidity, wind speed, precipitation + 24h rolling means
+    E --> F[joblib Serialized Model]
+
+    F --> G[FastAPI Backend]
+
+    G --> H[Prediction Engine]
+
+    G --> I[Historical AQI API]
+
+    G --> J[Health Endpoint]
+
+    H --> K[Interactive Dashboard]
+
+    I --> K
+
+    J --> K
+```
 
 ---
 
-## API Endpoints
+## 🧠 Engineering Decisions
 
-### `GET /health`
-Returns model status, version, and backtest metrics.
+### Why Linear Regression?
+
+Although ensemble models such as **LightGBM** and **Random Forest** were evaluated, **Linear Regression** consistently produced the lowest forecasting error during rolling backtesting.
+
+The engineered lag, rolling statistics, and weather features created a largely linear relationship with the target, allowing a simpler model to generalize better while avoiding unnecessary complexity.
+
+---
+
+### Why Rolling Time-Series Backtesting?
+
+Random train-test splits introduce **data leakage** for time-series problems because future observations can appear in the training data.
+
+Instead, this project uses **rolling backtesting**, where each model is trained only on historical observations and evaluated on the next unseen time window. This closely mirrors how the model would perform in a real deployment.
+
+---
+
+### Why a 24-Hour Forecast?
+
+A 1-hour prediction task produced unrealistically high accuracy because the model primarily learned to copy the previous hour's AQI.
+
+Predicting **24 hours ahead** is significantly more challenging and requires the model to learn meaningful temporal, seasonal, pollution, and weather relationships rather than relying on short-term persistence.
+
+---
+
+### Why FastAPI?
+
+FastAPI was chosen because it provides:
+
+- Automatic request validation using Pydantic
+- Interactive Swagger/OpenAPI documentation
+- High-performance asynchronous request handling
+- Clean architecture for building production-ready REST APIs
+
+---
+
+### Why Docker?
+
+Docker ensures the application runs consistently across development and deployment environments by packaging the application, dependencies, and runtime configuration into a single reproducible container.
+
+---
+
+## 📂 Project Structure
+
+```text
+AQI-Forecaster/
+│
+├── api/
+│   ├── main.py          # FastAPI application entry point
+│   ├── routes.py        # API endpoints
+│   ├── predictor.py     # Prediction & historical data logic
+│   ├── schemas.py       # Request/response models
+│   ├── config.py        # Centralized configuration
+│   ├── logger.py        # Structured logging
+│   └── utils.py         # Utility functions
+│
+├── data/
+│   └── processed/
+│       └── delhi_aqi_clean.csv
+│   └── raw/
+│       ├── city_day.csv
+│       ├── city_hour.csv
+│       ├── station_day.csv  
+│       ├── station_hour.csv
+│       └── stations.csv
+│
+│── models/
+│   └── delhi_aqi_model.pkl
+│
+├── static/
+│   ├── css/
+│   └── js/
+│
+├── templates/
+│   └── index.html
+│
+├── notebooks/
+│   ├── 01_data_preparation.ipynb
+│   └── 02_model_training.ipynb
+│
+├── Dockerfile
+├── requirements.txt
+├── .dockerignore
+└── README.md
+```
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+Before running the project, ensure you have:
+
+- Python 3.13+
+- Git
+- Docker *(optional, for containerized deployment)*
+
+---
+
+## 📥 Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/Yash06-blip/AQI-Forecaster.git
+cd AQI-Forecaster
+```
+
+Create a virtual environment:
+
+```bash
+python -m venv .venv
+```
+
+Activate the virtual environment:
+
+**Windows**
+
+```bash
+.venv\Scripts\activate
+```
+
+**macOS / Linux**
+
+```bash
+source .venv/bin/activate
+```
+
+Install the dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Run the application:
+
+```bash
+uvicorn api.main:app --reload
+```
+
+The application will be available at:
+
+- Dashboard → http://127.0.0.1:8000
+- API Documentation → http://127.0.0.1:8000/docs
+- Health Endpoint → http://127.0.0.1:8000/health
+
+---
+
+## 🐳 Running with Docker
+
+Build the Docker image:
+
+```bash
+docker build -t aqi-forecaster .
+```
+
+Run the container:
+
+```bash
+docker run -p 8000:8000 aqi-forecaster
+```
+
+Open your browser:
+
+- Dashboard → http://localhost:8000
+- API Documentation → http://localhost:8000/docs
+
+---
+
+# 📡 API Reference
+
+The application exposes RESTful endpoints for forecasting AQI, retrieving historical trends, and monitoring application health.
+
+---
+
+## GET `/`
+
+Returns the interactive dashboard.
+
+**Purpose**
+
+- Load the web interface
+- Submit AQI forecasting requests
+- View historical AQI trends
+
+---
+
+## GET `/health`
+
+Returns the application's health status and model metadata.
+
+### Example Response
 
 ```json
 {
@@ -75,10 +338,14 @@ Returns model status, version, and backtest metrics.
 }
 ```
 
-### `POST /forecast`
-Returns 24-hour AQI prediction with confidence range and category.
+---
 
-**Sample request:**
+## POST `/forecast`
+
+Generates a 24-hour AQI forecast using historical pollution, weather, and temporal features.
+
+### Example Request
+
 ```json
 {
   "AQI_lag_24h": 187.0,
@@ -109,7 +376,8 @@ Returns 24-hour AQI prediction with confidence range and category.
 }
 ```
 
-**Sample response:**
+### Example Response
+
 ```json
 {
   "forecast_datetime": "2019-11-16 14:00:00",
@@ -125,81 +393,96 @@ Returns 24-hour AQI prediction with confidence range and category.
 
 ---
 
-## Local Setup
+## GET `/history`
 
-```bash
-# Clone the repo
-git clone https://github.com/Yash06-blip/AQI-Forecaster.git
-cd AQI-Forecaster
+Returns historical daily average AQI values used by the dashboard visualization.
 
-# Create virtual environment
-python -m venv .venv
-.venv\Scripts\activate  # Windows
-source .venv/bin/activate  # Mac/Linux
+### Example Response
 
-# Install dependencies
-pip install -r requirements.txt
-
-# Run the API
-uvicorn api.main:app --reload
+```json
+{
+  "dates": [
+    "2020-06-01",
+    "2020-06-02",
+    "2020-06-03"
+  ],
+  "aqi_values": [
+    182.4,
+    176.8,
+    190.7
+  ],
+  "source": "CPCB Delhi monitoring data 2015-2020",
+  "days": 30
+}
 ```
 
-Then open `http://127.0.0.1:8000/docs` for the interactive API documentation.
+---
+
+# 📈 Model Features
+
+The forecasting model uses **29 engineered features** derived from historical AQI measurements, weather conditions, and temporal information.
+
+| Category | Features |
+|----------|----------|
+| 🕒 Temporal | Hour, Day of Week, Month, Weekend Flag, Season |
+| 🌫 AQI History | AQI lag (24h, 48h, 72h, 168h, 8760h) |
+| 📊 Rolling Statistics | 24h Mean, 48h Mean, 24h Std, 24h Max, 24h Min |
+| 🏭 Pollutants | PM2.5, PM10, NO₂, CO, SO₂, O₃ |
+| 🌦 Weather | Temperature, Humidity, Wind Speed, Precipitation (lagged and rolling means) |
+
+These engineered features allow the model to capture both **short-term pollution dynamics** and **longer-term seasonal trends**, improving its ability to forecast AQI 24 hours into the future.
 
 ---
 
-## Data Sources
+# 📁 Dataset
 
-| Source | What it provides |
-|---|---|
-| [Kaggle — Air Quality Data in India](https://www.kaggle.com/datasets/rohanrao/air-quality-data-in-india) | Hourly AQI + pollutant readings for Delhi, 2015–2020 |
-| [Open-Meteo](https://open-meteo.com) | Free historical hourly weather data — temperature, humidity, wind, precipitation |
+The forecasting model was trained using publicly available air quality and weather datasets.
 
----
+| Source | Description |
+|----------|-------------|
+| **Kaggle – Air Quality Data in India** | Hourly AQI and pollutant measurements for Delhi (2015–2020), sourced from CPCB monitoring stations. |
+| **Open-Meteo** | Historical hourly weather observations including temperature, humidity, wind speed, and precipitation. |
 
-## Project Structure
-AQI-Forecaster/
-│
-├── api/
-│   └── main.py           ← FastAPI application
-│
-├── notebooks/
-│   ├── 01_exploration.ipynb     ← Data cleaning + feature engineering
-│   └── 02_model_training.ipynb  ← Model training + backtest evaluation
-│
-├── src/                  ← (pipeline modules — v2 roadmap)
-│
-├── requirements.txt
-├── Dockerfile
-└── README.md
+### Data Processing
+
+Before training, the datasets were:
+
+- Merged on hourly timestamps
+- Cleaned and imputed for missing values
+- Converted into temporal features
+- Enhanced with lag features
+- Enhanced with rolling statistical features
+- Used for rolling time-series backtesting
 
 ---
 
-## Key Engineering Decisions
+# 🔮 Future Improvements
 
-**Why Linear Regression over LightGBM?**
-After tuning LightGBM across 5 parameter sets, Linear Regression consistently 
-outperformed it on the holdout set. The engineered lag and rolling features 
-create a near-linear relationship with the target — LightGBM's additional 
-complexity overfit noise rather than learning signal.
+Some planned enhancements for future iterations of the project include:
 
-**Why rolling backtest instead of random split?**
-AQI data has strong temporal dependency. A random split would allow the model 
-to train on 2019 data to predict 2017 — that's data leakage. The rolling 
-backtest strictly trains on the past to predict the next unseen month, 
-accurately simulating real-world deployment.
-
-**Why 24-hour forecast horizon?**
-Initial 1-hour forecasting showed R²=0.995 with AQI_lag_1h alone — the model 
-was just copying the previous hour. Switching to 24-hour forecasting forced 
-the model to learn genuine temporal and meteorological patterns.
+- 📍 Support forecasting for multiple Indian cities instead of Delhi only.
+- ☁️ Replace CSV-based historical data with a PostgreSQL database.
+- 📡 Integrate live AQI and weather APIs for real-time forecasting.
+- 📱 Improve the dashboard with mobile-first responsive design.
+- 📈 Add feature importance and prediction explanation visualizations.
+- 🔄 Automate periodic model retraining using updated datasets.
+- 🚀 Deploy CI/CD pipelines for automated testing and deployment.
 
 ---
 
-## Live API
+## 🌐 Live API
 
-🔗 🔗 **Live API:** https://aqi-forecaster-q1vv.onrender.com/docs
+🔗 **Dashboard:** https://aqi-forecaster-q1vv.onrender.com
 
---- 
+📚 **Swagger Docs:** https://aqi-forecaster-q1vv.onrender.com/docs
 
-*Built by Yash Bagde*
+---
+
+# 👨‍💻 Author
+
+**Yash Bagde**
+
+Aspiring Software Engineer | Machine Learning & Backend Development
+
+- GitHub: https://github.com/Yash06-blip
+- LinkedIn: https://www.linkedin.com/in/yash-0613-bagde
