@@ -3,7 +3,6 @@
 
 # Raw and processed data — too large for GitHub
 data/raw/
-data/processed/
 
 # Jupyter checkpoints
 .ipynb_checkpoints/
