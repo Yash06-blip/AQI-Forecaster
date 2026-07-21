@@ -12,9 +12,10 @@
 
 ## 🚀 Live Demo
 
-🌐 **Dashboard:** *(Render link here)*
+🌐 **Dashboard:** [*(Render link here)*](https://aqi-forecaster-q1vv.onrender.com/)
 
-📚 **API Documentation:** *(Render link)/docs*
+📚 **API Documentation:** [*(Render link)/docs*](https://aqi-forecaster-q1vv.onrender.com/docs)
+
 
 ---
 
@@ -467,14 +468,6 @@ Some planned enhancements for future iterations of the project include:
 - 📈 Add feature importance and prediction explanation visualizations.
 - 🔄 Automate periodic model retraining using updated datasets.
 - 🚀 Deploy CI/CD pipelines for automated testing and deployment.
-
----
-
-## 🌐 Live API
-
-🔗 **Dashboard:** https://aqi-forecaster-q1vv.onrender.com
-
-📚 **Swagger Docs:** https://aqi-forecaster-q1vv.onrender.com/docs
 
 ---
 
