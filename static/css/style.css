@@ -50,10 +50,11 @@
     }
 
     .logo-subtitle{
-    font-size:0.85rem;
+    font-size:0.81rem;
+    opacity: 0.7;
     color:var(--muted);
     margin-top:4px;
-    margin-left:18px;
+    margin-left:6px;
 }
     .logo-dot {
       width: 10px; height: 10px;
