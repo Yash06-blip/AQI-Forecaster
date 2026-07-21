@@ -49,6 +49,12 @@
       color: var(--text);
     }
 
+    .logo-subtitle{
+    font-size:0.85rem;
+    color:var(--muted);
+    margin-top:4px;
+    margin-left:18px;
+}
     .logo-dot {
       width: 10px; height: 10px;
       border-radius: 50%;

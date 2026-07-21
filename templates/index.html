@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Delhi Air Quality Forecast</title>
+  <title>AQI Forecaster</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <link rel="stylesheet" href="/static/css/style.css">
@@ -11,11 +11,18 @@
 <body>
 
 <header>
-  <div class="logo">
-    <div class="logo-dot"></div>
-    Delhi Air Quality Forecast
-  </div>
-  <div class="header-meta" id="liveClock">—</div>
+    <div>
+        <div class="logo">
+            <div class="logo-dot"></div>
+            AQI Forecaster
+        </div>
+
+        <div class="logo-subtitle">
+            Forecasting Delhi's Air Quality with Machine Learning
+        </div>
+    </div>
+
+    <div class="header-meta" id="liveClock">—</div>
 </header>
 
 <main>
@@ -40,7 +47,7 @@
     <div class="card forecast-card">
       <div>
         <div class="card-label">What this means for you</div>
-        <div class="forecast-headline" id="forecastHeadline">Calculating Delhi's air for tomorrow…</div>
+        <div class="forecast-headline" id="forecastHeadline">Calculating air quality for tomorrow…</div>
         <div class="forecast-subline" id="forecastSubline">Based on today's pollution readings, weather data, and seasonal patterns.</div>
       </div>
 
@@ -218,7 +225,5 @@
 </div>
 
 <script src="/static/js/app.js"></script>
-</body>
-</html> 
 </body>
 </html>
